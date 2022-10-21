@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Projekat.Front.Controllers;
+using Projekat.Front.Infrastructure.Caching;
 using Projekat.Front.Infrastructure.Persistence;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,10 @@ builder.Services.AddDbContext<StackOverflow2010Context>(x =>
     {
         providerOptions.CommandTimeout(180);
     }));
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(opt =>
+    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")));
+builder.Services.AddScoped<ICacheService, CacheService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
