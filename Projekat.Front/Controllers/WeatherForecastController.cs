@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Projekat.Front.Infrastructure.Persistence;
 
 namespace Projekat.Front.Controllers
 {
@@ -12,10 +13,13 @@ namespace Projekat.Front.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly StackOverflow2010Context _context;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger,
+            StackOverflow2010Context context)
         {
             _logger = logger;
+            _context = context;
         }
 
         [HttpGet]
@@ -25,7 +29,7 @@ namespace Projekat.Front.Controllers
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                Summary = _context.Users.Count().ToString()
             })
             .ToArray();
         }
