@@ -15,6 +15,8 @@ builder.Services.AddDbContext<StackOverflow2010Context>(x =>
         providerOptions.CommandTimeout(180);
     }));
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
