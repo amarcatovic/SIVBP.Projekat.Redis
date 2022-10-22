@@ -26,6 +26,28 @@ namespace Projekat.Front.Controllers
             _cache = cache;
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchPostsAsync([FromQuery] string term)
+        {
+            var result = await _context
+                .Posts
+                .Where(p => p.Title != null && EF.Functions.Like(p.Title, $"%{term}%"))
+                .ToListAsync();
+
+            return Ok(result);
+        }
+
+        [HttpGet("search/cache")]
+        public async Task<IActionResult> SearchCachedPostsAsync([FromQuery] string term)
+        {
+            var posts = await _cache.Get<List<PostTitleCache>>(Constants.POSTS_TITLE_ID);
+            var result = posts
+                .Where(p => p.Title != null && p.Title.Contains(term))
+                .ToList();
+
+            return Ok(result);
+        }
+
         [HttpGet("latest")]
         public async Task<IActionResult> GetLatestPostsAsync(int numberOfPosts = 10)
         {
@@ -43,6 +65,23 @@ namespace Projekat.Front.Controllers
                 result = await GetLatestPostsMappedAsync(numberOfPosts, true);
             }
 
+            return Ok(result);
+        }
+
+        [HttpGet("cache-names")]
+        public async Task<IActionResult> CacheAllNamesAsync(int numberOfPosts = 10)
+        {
+            var result = await _context
+                .Posts
+                .Where(p => p.Title != null)
+                .Select(p => new PostTitleCache
+                {
+                    Id = p.Id,
+                    Title = p.Title
+                })
+                .ToListAsync();
+
+            await _cache.Create(result, Constants.POSTS_TITLE_ID);
             return Ok(result);
         }
 
