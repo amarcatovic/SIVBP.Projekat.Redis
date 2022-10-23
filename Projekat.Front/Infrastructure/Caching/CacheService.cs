@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using Projekat.Front.Dtos;
+using Projekat.Front.Infrastructure.Persistence.Models;
+using Projekat.Front.Utilities;
 using StackExchange.Redis;
 using System.Text.Json;
 
@@ -9,6 +11,8 @@ namespace Projekat.Front.Infrastructure.Caching
         Task<bool> KeyExistsAsync(string key);
         Task Create<T>(T item, string key);
         Task<T> Get<T>(string key);
+        Task UpdateLatestPostCacheAsync(PostReadDto postReadDto);
+        Task UpdateCachedPostViewCountAsync(int postId, int viewCount);
     }
 
     public class CacheService : ICacheService
@@ -52,6 +56,51 @@ namespace Projekat.Front.Infrastructure.Caching
             var result = await db.StringGetAsync(key);
 
             return !string.IsNullOrEmpty(result);
+        }
+
+        public async Task UpdateCachedPostViewCountAsync(int postId, int viewCount)
+        {
+            var db = _redis.GetDatabase();
+            var cachedItems = await db.StringGetAsync(Constants.LATEST_POSTS_KEY);
+
+            if (string.IsNullOrEmpty(cachedItems))
+            {
+                return;
+            }
+
+            var cache = JsonSerializer.Deserialize<List<PostReadDto>>(cachedItems);
+            var item = cache.FirstOrDefault(p => p.Id == postId);
+
+            if (item == null)
+            {
+                return;
+            }
+
+            item.ViewCount = viewCount;
+
+            var serialItem = JsonSerializer.Serialize(cache);
+            await db.StringSetAsync(Constants.LATEST_POSTS_KEY, serialItem);
+        }
+
+        public async Task UpdateLatestPostCacheAsync(PostReadDto postReadDto)
+        {
+            var db = _redis.GetDatabase();
+            var cachedItems = await db.StringGetAsync(Constants.LATEST_POSTS_KEY);
+
+            if (string.IsNullOrEmpty(cachedItems))
+            {
+                return;
+            }
+
+            var cache = JsonSerializer.Deserialize<List<PostReadDto>>(cachedItems);
+
+            cache.Insert(0, postReadDto);
+            cache = cache
+                .Take(10)
+                .ToList();
+
+            var serialItem = JsonSerializer.Serialize(cache);
+            await db.StringSetAsync(Constants.LATEST_POSTS_KEY, serialItem);
         }
     }
 }

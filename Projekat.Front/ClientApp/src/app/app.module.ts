@@ -17,6 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { PostComponent } from './shared/post/post.component';
+import { CreatePostComponent } from './create-post/create-post.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { PostComponent } from './shared/post/post.component';
     CounterComponent,
     FetchDataComponent,
     PostComponent,
+    CreatePostComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -38,6 +40,7 @@ import { PostComponent } from './shared/post/post.component';
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },
       { path: 'post/:id', component: PostComponent },
+      { path: 'create', component: CreatePostComponent },
     ]),
     BrowserAnimationsModule,
     MatTableModule,

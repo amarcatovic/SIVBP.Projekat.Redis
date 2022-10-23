@@ -9,6 +9,7 @@ namespace Projekat.Front.Profiles
         public MappingProfiles()
         {
             CreateMap<Post, PostReadDto>();
+            CreateMap<CreatePostDto, Post>();
         }
     }
 }

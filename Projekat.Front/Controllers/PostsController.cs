@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Projekat.Front.Dtos;
 using Projekat.Front.Infrastructure.Caching;
 using Projekat.Front.Infrastructure.Persistence;
+using Projekat.Front.Infrastructure.Persistence.Models;
 using Projekat.Front.Utilities;
 
 namespace Projekat.Front.Controllers
@@ -97,8 +98,27 @@ namespace Projekat.Front.Controllers
                 return NotFound("This post does not exist!");
             }
 
+            ++post.ViewCount;
+            await _context.SaveChangesAsync();
+            await _cache.UpdateCachedPostViewCountAsync(post.Id, post.ViewCount);
+
             var result = _mapper.Map<PostReadDto>(post);
             return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreatePostAsync([FromBody] CreatePostDto postDto)
+        {
+            var post = _mapper.Map<Post>(postDto);
+            post.CreationDate = DateTime.Now;
+            post.LastActivityDate = DateTime.Now;
+            post.AnswerCount = 0;
+
+            await _context.AddAsync(post);
+            await _context.SaveChangesAsync();
+            await _cache.UpdateLatestPostCacheAsync(_mapper.Map<PostReadDto>(post));
+
+            return StatusCode(201);
         }
 
         private async Task<List<PostReadDto>> GetLatestPostsMappedAsync(int numberOfPosts, bool cacheResult = false)
