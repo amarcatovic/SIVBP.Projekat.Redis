@@ -16,6 +16,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { PostComponent } from './shared/post/post.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { MatIconModule } from '@angular/material/icon';
     HomeRedisComponent,
     CounterComponent,
     FetchDataComponent,
+    PostComponent,
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -35,6 +37,7 @@ import { MatIconModule } from '@angular/material/icon';
       { path: 'home-redis', component: HomeRedisComponent },
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },
+      { path: 'post/:id', component: PostComponent },
     ]),
     BrowserAnimationsModule,
     MatTableModule,

@@ -85,6 +85,22 @@ namespace Projekat.Front.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetPostByIdAsync(int id)
+        {
+            var post = await _context
+                .Posts
+                .SingleOrDefaultAsync(p => p.Id == id);
+
+            if (post == null)
+            {
+                return NotFound("This post does not exist!");
+            }
+
+            var result = _mapper.Map<PostReadDto>(post);
+            return Ok(result);
+        }
+
         private async Task<List<PostReadDto>> GetLatestPostsMappedAsync(int numberOfPosts, bool cacheResult = false)
         {
             var posts = await _context
